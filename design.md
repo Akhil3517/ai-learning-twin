@@ -4,68 +4,81 @@
 
 AI-powered learning platform that detects false confidence, generates adaptive roadmaps, and provides multilingual code mentoring. Built for 2-4 week hackathon MVP targeting India's developer workforce.
 
+---
+
 ## Architecture
 
 ### System Architecture
 
+```mermaid
+%%{init: {'theme':'dark'}}%%
+graph TB
+    subgraph PRESENTATION["🖥️ PRESENTATION TIER"]
+        WebApp["React Web App<br/>• Roadmap Dashboard<br/>• Quiz Interface"]
+        VSCode["VS Code Extension<br/>• Real-time Hints<br/>• Amazon Q Integration"]
+    end
+    
+    Cognito["🔐 Amazon Cognito<br/>Authentication"]
+    
+    subgraph API["🌐 API LAYER"]
+        Gateway["API Gateway<br/>Rate Limit + CORS"]
+    end
+    
+    subgraph SERVICE["⚙️ SERVICE LAYER - Lambda"]
+        Orchestrator["Learning Orchestrator<br/>Roadmap + Session Mgmt"]
+        IDEAssist["IDE Assistant<br/>Code Analysis"]
+        Analytics["Analytics Engine<br/>Metrics + Insights"]
+    end
+    
+    subgraph AI["🚀 AI INTELLIGENCE ENGINE - Amazon Bedrock"]
+        subgraph CORE["⭐ CORE INNOVATIONS"]
+            FCEngine["FALSE CONFIDENCE ENGINE<br/>FC = Self - Performance<br/>📊 40% calibration improvement<br/>📊 60% overconfidence reduction"]
+            Twin["LEARNING TWIN<br/>Mastery + Velocity Tracking<br/>📊 25% faster acquisition<br/>📊 35% dropout reduction"]
+            SkillGap["SKILL GAP ANALYZER<br/>Amazon Q + NIELIT Alignment<br/>📊 95% job-skill match"]
+        end
+        L1L2L3["L1→L2→L3<br/>Progression"]
+        QGen["Question<br/>Generator"]
+        CodeAnal["Code<br/>Analyzer"]
+    end
+    
+    subgraph DATA["💾 DATA TIER - DynamoDB"]
+        TwinDB[("Learning<br/>Twin DB")]
+        SessionDB[("Session<br/>History DB")]
+        RoadmapDB[("Roadmap<br/>Config DB")]
+        MarketDB[("NIELIT +<br/>Market DB<br/>(External)")]
+    end
+    
+    WebApp --> Cognito
+    VSCode --> Cognito
+    Cognito --> Gateway
+    Gateway --> Orchestrator
+    Gateway --> IDEAssist
+    Gateway --> Analytics
+    
+    Orchestrator --> FCEngine
+    IDEAssist --> CodeAnal
+    Analytics --> Twin
+    
+    FCEngine --> Twin
+    Twin --> SkillGap
+    SkillGap --> L1L2L3
+    SkillGap --> QGen
+    
+    FCEngine -.->|Read/Write| TwinDB
+    Twin -.->|Read/Write| TwinDB
+    Orchestrator -.->|Read/Write| SessionDB
+    SkillGap -.->|Read| RoadmapDB
+    Analytics -.->|Read| MarketDB
+    
+    classDef default fill:#1e1e1e,stroke:#555555,stroke-width:2px,color:#ffffff
+    classDef core fill:#2d2d2d,stroke:#888888,stroke-width:4px,color:#ffffff
+    
+    class FCEngine,Twin,SkillGap core
 ```
-                    ┌─────────────────────────────────────┐
-                    │         USER INTERFACES             │
-                    │  React Web App  |  VS Code + Q      │
-                    └──────────────┬──────────────────────┘
-                                   │
-                    ┌──────────────▼──────────────────────┐
-                    │      API Gateway + Cognito          │
-                    └──────────────┬──────────────────────┘
-                                   │
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃          SERVICE LAYER (Lambda)                   ┃
-        ┃  ┌──────────────┐  ┌──────────────┐  ┌─────────┐  ┃
-        ┃  │  Learning    │  │     IDE      │  │Analytics│  ┃
-        ┃  │ Orchestrator │  │  Assistant   │  │ Engine  │  ┃
-        ┃  └──────┬───────┘  └──────┬───────┘  └────┬────┘  ┃
-        ┗━━━━━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━━━━━━━┿━━━━━━━━┛
-                  │                 │                │
-        ┏━━━━━━━━━▼━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━▼━━━━━┓
-        ┃                                                  ┃
-        ┃     ╔═══════════════════════════════════════╗    ┃
-        ┃     ║   AI INTELLIGENCE ENGINE (Bedrock)    ║    ┃
-        ┃     ║                                       ║    ┃
-        ┃     ║   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓    ║    ┃
-        ┃     ║   ┃ ⭐FALSE CONFIDENCE ENGINE ⭐┃    ║    ┃
-        ┃     ║   ┗━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━┛    ║    ┃
-        ┃     ║                 │                     ║    ┃
-        ┃     ║   ┏━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━┓     ║    ┃
-        ┃     ║   ┃ ⭐ LEARNING TWIN ⭐        ┃     ║    ┃
-        ┃     ║   ┗━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━┛     ║    ┃
-        ┃     ║                 │                     ║    ┃
-        ┃     ║   ┏━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━┓     ║    ┃
-        ┃     ║   ┃ ⭐ SKILL GAP ANALYZER ⭐   ┃     ║    ┃
-        ┃     ║   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛     ║    ┃
-        ┃     ║                                       ║    ┃
-        ┃     ║   [L1→L2→L3]  [Question Gen]          ║    ┃
-        ┃     ╚═══════════════════════════════════════╝    ┃
-        ┃                                                  ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━┯━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-                              │
-        ┏━━━━━━━━━━━━━━━━━━━━━▼━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃              DATA LAYER (DynamoDB)              ┃
-        ┃   ╔═══════╗  ╔═══════╗  ╔═══════╗  ╔═════════╗  ┃
-        ┃   ║ Twin  ║  ║Session║  ║Roadmap║  ║ NIELIT+ ║  ┃
-        ┃   ║  DB   ║  ║  DB   ║  ║  DB   ║  ║Market DB║  ┃
-        ┃   ╚═══════╝  ╚═══════╝  ╚═══════╝  ╚═════════╝  ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-```
 
-### Architecture Components
+---
 
-**Frontend**: React web app + VS Code extension (Amazon Q integration)
-**API Layer**: API Gateway (routing, rate limiting) + Cognito (auth)
-**Service Layer**: Lambda functions for orchestration, IDE assistance, analytics
-**AI Engine**: Bedrock-powered intelligence with 3 core innovations
-**Data Layer**: DynamoDB for real-time state, session logs, roadmap config
-
-### Expected Impact Metrics
+## Expected Impact Metrics
 
 **Learning Outcomes:**
 - 35% reduction in dropout rate (early struggle detection + intervention)
@@ -82,59 +95,143 @@ AI-powered learning platform that detects false confidence, generates adaptive r
 - 45% reduction in false confidence incidents in production code
 - 2x improvement in learner retention (personalized adaptive paths)
 
+---
+
+## False Confidence Engine (Core Innovation)
+
+**Input Signals**: 
+- Self-rated confidence (1-5)
+- Quiz accuracy
+- Time taken
+- Hint usage
+- Error rate
+- Reattempt count
+
+**Feature Vector**: 
+```
+F = [normalized_quiz_score, normalized_debug_time, hint_independence_score, 
+     code_quality, reattempt_penalty]
+```
+
+**Performance Score**: 
+```
+PS = 0.35×quiz + 0.20×debug_efficiency + 0.20×hint_independence + 
+     0.15×code_quality + 0.10×reattempt_penalty
+```
+
+**False Confidence**: 
+```
+FC = SelfConfidence - PS
+```
+
+**Thresholds**: 
+- FC > 0.3 → Overconfidence (block progression)
+- FC < -0.3 → Underconfidence (fast-track)
+- Otherwise → Calibrated (normal progression)
+
+**Progression Gates**: 
+- L1→L2 requires FC < 0.3
+- L2→L3 requires FC < 0.2
+
+---
+
+## System Flows
+
+### Learning Session Flow
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+flowchart TD
+    A[User Starts Session] --> B[Lambda Fetches Learning Twin from DynamoDB]
+    B --> C[Bedrock Generates L1/L2/L3 Questions Based on Mastery]
+    C --> D[User Completes Quiz]
+    D --> E[FC Engine Calculates FC Score]
+    E --> F{FC > 0.3?}
+    F -->|Yes| G[Block Progression + Generate Remediation]
+    F -->|No| H[Update Learning Twin + Unlock Next Topic]
+    G --> I[Store Session in DynamoDB]
+    H --> I
+    
+    classDef default fill:#1e1e1e,stroke:#555555,stroke-width:2px,color:#ffffff
+    classDef decision fill:#2d2d2d,stroke:#888888,stroke-width:3px,color:#ffffff
+    classDef critical fill:#2d2d2d,stroke:#888888,stroke-width:3px,color:#ffffff
+    
+    class E,F critical
+```
+
+### IDE Assistance Flow
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+flowchart TD
+    A[Developer Writes Code in VS Code] --> B[Amazon Q Captures Context]
+    B --> C[Lambda Sends Code to Bedrock]
+    C --> D[Bedrock Analyzes Intent vs Implementation]
+    D --> E[Returns Multilingual Hints]
+    E --> F[Updates Learning Twin with Coding Patterns]
+    
+    classDef default fill:#1e1e1e,stroke:#555555,stroke-width:2px,color:#ffffff
+    classDef critical fill:#2d2d2d,stroke:#888888,stroke-width:3px,color:#ffffff
+    
+    class D,F critical
+```
+
+### Confidence Evaluation Flow
+
+```mermaid
+%%{init: {'theme':'dark'}}%%
+flowchart TD
+    A[User Completes Activity] --> B[System Collects Performance Signals]
+    B --> C[FC Engine Constructs Feature Vector]
+    C --> D[Calculate Performance Score PS]
+    D --> E[Calculate False Confidence: FC = Self - PS]
+    E --> F{Apply Threshold Logic}
+    F -->|FC > 0.3| G[Overconfident: Block Progression]
+    F -->|FC < -0.3| H[Underconfident: Fast-Track]
+    F -->|Otherwise| I[Calibrated: Normal Progression]
+    G --> J[Update Learning Twin]
+    H --> J
+    I --> J
+    J --> K[Trigger Adaptive Action]
+    
+    classDef default fill:#1e1e1e,stroke:#555555,stroke-width:2px,color:#ffffff
+    classDef critical fill:#2d2d2d,stroke:#888888,stroke-width:3px,color:#ffffff
+    
+    class C,E,F critical
+```
+
+---
+
+## AI Intelligence Engine
+
+**⭐ FALSE CONFIDENCE ENGINE ⭐**: Calculates `FC = SelfConfidence - PerformanceScore`. Threshold logic: FC > 0.3 → block progression, FC < -0.3 → fast-track. Gates L1→L2→L3 based on calibration.
+
+**⭐ LEARNING TWIN ⭐**: Maintains mastery scores (exponential moving average), tracks learning velocity, stores FC delta history, adapts roadmap dynamically, predicts struggle points using logistic regression.
+
+**⭐ SKILL GAP ANALYZER ⭐**: Compares current mastery vs job requirements, identifies priority gaps with NIELIT alignment, estimates time to proficiency, generates personalized roadmaps.
+
+**Supporting Components**: L1→L2→L3 Engine (enforces progression), Question Generator (adaptive difficulty)
+
+---
+
+## Service & Data Layers
+
 ### Service Layer (Lambda Functions)
 
-**Learning Orchestrator**: 
-- Roadmap generation with job role alignment
-- Session management and performance signal capture
-- Multilingual content translation (Hindi/Tamil/Telugu/Marathi)
-- FC evaluation triggering
+**Learning Orchestrator**: Roadmap generation, session management, multilingual translation, FC evaluation
 
-**IDE Assistant**: 
-- VS Code integration via Amazon Q
-- Real-time code analysis (intent vs implementation)
-- Inline hints and explanations
-- Learning Twin state updates from coding patterns
+**IDE Assistant**: VS Code + Amazon Q integration, real-time code analysis, inline hints, Learning Twin updates
 
-**Analytics Engine**: 
-- Platform metrics and learning outcome tracking
-- Job market trend aggregation (via Amazon Q)
-- Dropout prediction and intervention
-- Roadmap relevance updates
-
-### AI Intelligence Engine (Core Innovation - Bedrock Powered)
-
-**⭐ FALSE CONFIDENCE ENGINE ⭐** (Primary Innovation)
-- Calculates FC score: `FalseConfidence = SelfConfidence - PerformanceScore`
-- Performance Score: `PS = 0.35×quiz + 0.20×debug_efficiency + 0.20×hint_independence + 0.15×code_quality + 0.10×reattempt_penalty`
-- Threshold logic: FC > 0.3 → Overconfidence (block), FC < -0.3 → Underconfidence (fast-track)
-- Gates L1→L2→L3 progression based on calibration
-- Triggers remediation or acceleration paths
-
-**⭐ LEARNING TWIN ⭐** (Adaptive Intelligence)
-- Maintains per-skill mastery scores (exponential moving average)
-- Tracks learning velocity (skills/hour) and cognitive load
-- Stores FC delta history for trend analysis
-- Adapts roadmap dynamically based on performance patterns
-- Predicts struggle points and optimal learning paths
-- Roadblock prediction: Lightweight logistic regression or LLM-based reasoning estimates failure probability using learning velocity and calibration delta
-
-**⭐ SKILL GAP ANALYZER ⭐** (Job Market Alignment)
-- Compares current mastery vs target job requirements
-- Identifies priority learning gaps with NIELIT curriculum alignment
-- Estimates time to proficiency based on learning velocity
-- Generates personalized skill roadmaps with dependencies
-
-**Supporting Components:**
-- **L1→L2→L3 Engine**: Enforces level-based progression, blocks advancement if FC > threshold
-- **Question Generator**: Creates adaptive questions (basic, scenario-based, failure-at-scale)
+**Analytics Engine**: Platform metrics, job market trends (Amazon Q), dropout prediction, roadmap updates
 
 ### Data Layer
 
-**Learning Twin DB (DynamoDB)**: UserLearningTwin state (mastery, confidence, velocity per skill)
-**Session History DB (DynamoDB)**: Quiz results, time spent, hints used, error rates, reattempts
-**Roadmap Config DB (DynamoDB)**: Skill dependencies, job role requirements, progression rules
-**NIELIT + Market DB (DynamoDB)**: Curriculum data, certification paths, job market trends (updated periodically)
+- **Learning Twin DB**: UserLearningTwin state (mastery, confidence, velocity per skill)
+- **Session History DB**: Quiz results, time, hints, errors, reattempts
+- **Roadmap Config DB**: Skill dependencies, job requirements, progression rules
+- **NIELIT + Market DB**: Curriculum data, certification paths, job trends (external)
+
+---
 
 ## Data Models
 
@@ -159,61 +256,48 @@ AI-powered learning platform that detects false confidence, generates adaptive r
   selfRatedConfidence: float, timestamp: timestamp }
 ```
 
-## False Confidence Engine
-
-**Input Signals**: Self-rated confidence (1-5), quiz accuracy, time taken, hint usage, error rate, reattempt count
-
-**Feature Vector**: `F = [normalized_quiz_score, normalized_debug_time, hint_independence_score, code_quality, reattempt_penalty]`
-
-**Performance Score**: `PS = 0.35×quiz + 0.20×debug_efficiency + 0.20×hint_independence + 0.15×code_quality + 0.10×reattempt_penalty`
-
-**False Confidence**: `FC = SelfConfidence - PS`
-
-**Thresholds**: FC > 0.3 → Overconfidence (block), FC < -0.3 → Underconfidence (fast-track), Otherwise → Calibrated
-
-**Progression Gates**: L1→L2 requires FC < 0.3, L2→L3 requires FC < 0.2
-
-## System Flows
-
-**Learning Session**: User starts session → Lambda fetches Twin → Bedrock generates questions → User completes quiz → FC Engine calculates score → If FC > 0.3: block + remediation, else update Twin + unlock next → Store in DynamoDB
-
-**IDE Assistance**: Developer writes code → Amazon Q captures context → Lambda sends to Bedrock → Bedrock analyzes intent vs implementation → Returns multilingual hints → Updates Learning Twin
-
-**Confidence Evaluation**: User completes activity → System collects signals → FC Engine constructs feature vector → Calculates PS and FC → Applies threshold logic → Updates Twin → Triggers adaptive action
-
-## Key Components
-
-**Roadmap Generator**: Takes job role, skill level, time availability → Outputs ordered SkillNodes with timeline using topological sort
-
-**Skill Gap Analyzer**: Compares UserLearningTwin vs job requirements → Outputs priority-ranked gaps with estimated hours
-
-**False Confidence Engine**: Takes LearningSession data → Outputs FC score, progression decision, remediation plan
-
-**Learning Twin Updater**: Takes session results, FC score → Updates UserLearningTwin using exponential moving average
-
-**Multilingual Translator**: Takes English explanation, target language → Outputs culturally-aware translation (Hindi/Tamil/Telugu/Marathi)
-
-## AI Inference Pipeline
-
-```
-User Input → Context Enrichment (Twin + History) → Bedrock Inference 
-(Code Analysis | Question Generation | Explanation) → Post-Processing 
-(FC Calculation | Twin Update | Adaptive Decision) → Response Delivery
-```
+---
 
 ## MVP Scope
 
-**Included**: Adaptive roadmaps for 3 job roles, FC Engine with L1/L2 gates, Basic Learning Twin, Web app with quiz interface, Bedrock integration, DynamoDB storage
+**Included in Hackathon MVP**:
+- Adaptive roadmaps for 3 job roles (Full Stack, Data Engineer, DevOps)
+- FC Engine with L1/L2 gates
+- Basic Learning Twin (mastery + FC tracking)
+- Web app with quiz interface
+- Bedrock integration for code analysis
+- DynamoDB storage
 
-**Simulated**: L3 scenarios (pre-built), Multilingual (English + Hindi only), IDE extension (mockup), Amazon Q data (static)
+**Simulated for Demo**:
+- L3 "failure at scale" scenarios (pre-built examples)
+- Multilingual translation (English + Hindi only)
+- IDE extension (mockup with hardcoded responses)
+- Amazon Q job market data (static dataset)
 
-**Future**: Full multilingual support, Production IDE extension, Advanced Twin analytics, NIELIT lab integration, Mobile app
+**Future Scope**:
+- Full multilingual support (Tamil/Telugu/Marathi)
+- Production IDE extension with real-time analysis
+- Advanced Learning Twin analytics (dropout prediction)
+- NIELIT lab integration
+- Mobile app
+
+---
 
 ## Error Handling & Testing
 
-**Errors**: Invalid Input (400), Bedrock Timeout (retry 3x + fallback), DynamoDB Failure (503 + queue), FC Error (default FC=0)
+**Error Handling**:
+- **Invalid Input**: Return 400 with validation errors
+- **Bedrock Timeout**: Retry 3x with exponential backoff, fallback to cached response
+- **DynamoDB Failure**: Log error, return 503, queue for retry
+- **FC Calculation Error**: Default to FC = 0 (calibrated), log for review
 
-**Testing**: Unit tests (mocked dependencies), Property tests (100+ sessions), Integration tests (end-to-end), Load tests (1000 concurrent users)
+**Testing Strategy**:
+- **Unit Tests**: Test each Lambda function independently with mocked dependencies
+- **Property Tests**: Validate FC calculation consistency across 100+ random sessions
+- **Integration Tests**: End-to-end flow from user input to Learning Twin update
+- **Load Tests**: Simulate 1000 concurrent users for API Gateway + Lambda scaling
+
+---
 
 ## Correctness Properties
 
