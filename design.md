@@ -260,7 +260,7 @@ flowchart TD
 
 ## MVP Scope
 
-**Included in Hackathon MVP**:
+**MVP Features**:
 - Adaptive roadmaps for 3 job roles (Full Stack, Data Engineer, DevOps)
 - FC Engine with L1/L2 gates
 - Basic Learning Twin (mastery + FC tracking)
@@ -306,3 +306,4 @@ flowchart TD
 3. **Multilingual Consistency**: Translations preserve code snippets and technical terms
 4. **Twin Convergence**: Mastery scores converge to stable values after sufficient practice
 5. **Progression Gate Enforcement**: Users with FC > 0.3 are blocked from L1→L2 progression
+
