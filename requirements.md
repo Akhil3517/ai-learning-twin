@@ -14,6 +14,18 @@
 - **L1→L2→L3 Learning**: Progressive challenges from basic to "failure at scale" scenarios
 - **NIELIT Labs**: 30+ Indian government labs focusing on AI, cybersecurity, and emerging tech
 
+## Core vs Supporting Capabilities
+
+**Core Innovation:**
+- False Confidence Engine (calibration-driven progression gating)
+- AI Learning Twin (adaptive state + predictive analytics)
+- Adaptive Roadmap (job-aligned skill paths with NIELIT mapping)
+
+**Supporting Capabilities:**
+- IDE Assistant (real-time code analysis + hints)
+- Intelligence Feed (market trends + daily recommendations)
+- Market Alignment (Amazon Q integration for job data)
+
 ## Requirements
 
 ### R1: Adaptive Learning Roadmaps
